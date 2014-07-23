@@ -92,4 +92,12 @@ do
 done
 echo -e "Run generating freebase.nationalities"
 cat info/location.info | python ${_crawler_path}convertJsonToColumns.py -b -t nationalities > freebase/freebase.nationalities
+
+if [ ! -d {$_data_path}"latest" ]; then
+  mkdir {$_data_path}"latest"
+fi
+
+mv info/* {$_data_path}"latest"
+mv freebase/* {$_data_path}"latest"
+
 echo -e "DONE"

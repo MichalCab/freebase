@@ -19,16 +19,6 @@ __author__ = "Michal Cab <xcabmi00@stud.fit.vutbr.cz>"
 global_replace_new_line = re.compile(r'((?<=\.)\s*\\n\s{2,})|[^.](\s+\\n\s+)')
 global_replace_backslash = re.compile(r'\\(?=[^n])')
 
-"""
-azbuka_vzor = re.compile('[\u0400-\u04ff]+')
-arabsky_vzor = re.compile('[\u0600-\u06ff]+')
-recky_vzor = re.compile('[\u0370-\u03ff]+')
-gruzinsky_vzor = re.compile('[\u10a0-\u10ff]+')
-hebrejsky_vzor = re.compile('[\u0590-\u05ff]+')
-asijske_vzor = re.compile('[\u3100-\u312f\u4e00-\u9fcc\u1100-\u11ff\u30a0-\u30ff\u3040-\u309f\uac00-\ud7af]+')
-armensky_vzor = re.compile('[\u0530-\u058f]+')
-"""
-
 global_unwanted_ids = []
 
 def get_wikipedia_url(_wikipedia_url):
@@ -54,16 +44,6 @@ def load_data(_filename, data_type):
     if "name" not in d:
       continue
 
-    """
-    if ("http://" in d["name"] or (
-        not azbuka_vzor.match(d["name"]) and
-        not arabsky_vzor.match(d["name"]) and
-        not recky_vzor.match(d["name"]) and
-        not gruzinsky_vzor.match(d["name"]) and
-        not hebrejsky_vzor.match(d["name"]) and
-        not asijske_vzor.match(d["name"]) and
-        not armensky_vzor.match(d["name"])) or
-    """
     if d["id"] in global_unwanted_ids:
       continue
     
@@ -91,7 +71,9 @@ def load_data(_filename, data_type):
 
 
     # artist, person
-    period_or_movement = []; influenced = []; influenced_by = []; place_of_birth = ""; place_of_death = ""; date_of_birth = ""; date_of_death = ""; profession = []; art_form = []; places_lived = []; gender = ""; nationality = []
+    period_or_movement = []; influenced = []; influenced_by = []; 
+    place_of_birth = ""; place_of_death = ""; date_of_birth = ""; 
+    date_of_death = ""; profession = []; art_form = []; places_lived = []; gender = ""; nationality = []
 
     # artwork
     artist = []; art_subject = []; art_form = ""; art_genre = []; media = []; support = []; period_or_movement = []; location = []; date_begun = ""; date_completed = ""; owner = []; dimensions = {"height":"", "width":"", "depth":""}

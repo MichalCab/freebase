@@ -393,11 +393,14 @@ def bind_image(splited_line, data, data_type):
       f = open('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]), 'wb')
       f.write(urllib.urlopen(url).read())
       f.close()
-
-    image = {}
-    image["path"] = "%s.jpg" % splited_line[2]
-    image["id"] = splited_line[2]
-    data["image"].append(image)
+      b = os.path.getsize('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
+    if b < 10000:
+      os.remove('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2])
+    else:
+      image = {}
+      image["path"] = "%s.jpg" % splited_line[2]
+      image["id"] = splited_line[2]
+      data["image"].append(image)
 
 def load_global_list(name):
   path = "help/"
