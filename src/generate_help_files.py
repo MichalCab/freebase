@@ -47,6 +47,8 @@ def generate_help_files():
   state_province_regions = []
   numbers = []  
   locations = []
+  owners = []
+  artwork_location_relationship = []
     
   a = 0
   start_time = time.time()  
@@ -109,6 +111,11 @@ def generate_help_files():
   
       if splited_line[1] == "<http://rdf.freebase.com/ns/people.place_lived.location>":
         locations.append(foringe_key)
+
+      if splited_line[1] == "<http://rdf.freebase.com/ns/visual_art.artwork_owner_relationship.owner>":
+        owners.append(foringe_key)
+      if splited_line[1] == "<http://rdf.freebase.com/ns/visual_art.artwork_location_relationship.location>":
+        artwork_location_relationship.append(foringe_key)
       
       if a % 250000 == 0:
         os.system('clear')
@@ -206,6 +213,12 @@ def generate_help_files():
         if len(locations) >= global_number_when_write_to_file:
           write_to_file("help/locations", locations)
           locations[:] = []
+        if len(owners) >= global_number_when_write_to_file:
+          write_to_file("help/owners", owners)
+          owners[:] = []
+        if len(artwork_location_relationship) >= global_number_when_write_to_file:
+          write_to_file("help/owners", artwork_location_relationship)
+          artwork_location_relationship[:] = []
 
   write_to_file("ids/artists_ids", artists_ids)
   write_to_file("ids/artworks_ids", artworks_ids)
@@ -229,6 +242,8 @@ def generate_help_files():
   write_to_file("help/state_province_regions", state_province_regions)
   write_to_file("help/numbers", numbers)
   write_to_file("help/locations", locations)
+  write_to_file("help/owners", owners)
+  write_to_file("help/artwork_location_relationship", artwork_location_relationship)
 
 def write_to_file(filename, data):
   f = open(filename, 'a')

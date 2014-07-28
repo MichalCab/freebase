@@ -19,6 +19,8 @@ from threading import Thread
 import multiprocessing
 import random
 import re
+from time import sleep
+from pprint import pprint
 
 from src.binary_search import *
 from src.load_file import *
@@ -42,6 +44,9 @@ global_postal_codes = []
 global_state_province_regions = []
 global_numbers = []
 global_locations = []
+global_owners = []
+global_artwork_location_relationship = []
+
 
 def load_from_stdin():
   content = sys.stdin.read().splitlines()
@@ -62,18 +67,18 @@ def convert_rdf_to_dic(ids, data_type):
   start_time = time.time()
   with gzip.open(global_gzip_filename, 'r') as infile:
     for line in infile:
+      
       if not line.startswith("<http://rdf.freebase.com/ns/m."):
         continue
 
       splited_line = line.split('\t')
 
       #save part of results to file
-      if len(results) >= 100000:
+      if len(results) >= 10000:
         print_data(results, data_type)
 
       old_item_id = item_id
       item_id = splited_line[0]
-
       # if next entity --> save previous entity and clear saving array for new entity
       if old_item_id != item_id:
         #determinate if this id is connect with entity witch we want to extract
@@ -84,7 +89,6 @@ def convert_rdf_to_dic(ids, data_type):
 
         if find_index != -1:
           if len(data) is not 0 and "name" in data:
-            #print data
             item["itemInfo"] = data
             results.append(json.dumps(item, separators=(',',':')))
           item.clear()
@@ -136,7 +140,8 @@ def determine_content(splited_line, data, data_type):
          splited_line, data,
          save_id=True)
     bind("<http://rdf.freebase.com/ns/people.person.profession>", "profession", 
-         splited_line, data)
+         splited_line, data, 
+         is_foreign_key=True)
     bind("<http://rdf.freebase.com/ns/people.person.places_lived>", "places_lived", 
          splited_line, data, 
          save_id=True, is_foreign_key=True)
@@ -194,10 +199,10 @@ def determine_content(splited_line, data, data_type):
          splited_line, data)
     bind("<http://rdf.freebase.com/ns/visual_art.artwork.owners>", "owner", 
          splited_line, data, 
-         save_id=True)
+         is_foreign_key=True, save_id=True)
     bind("<http://rdf.freebase.com/ns/visual_art.artwork.locations>", "location", 
          splited_line, data, 
-         save_id=True)
+         is_foreign_key=True, save_id=True)
     
   elif (data_type == "location"):
     bind("<http://rdf.freebase.com/ns/base.biblioness.bibs_location.country>", "country", 
@@ -273,7 +278,9 @@ def bind(
 
   if splited_line[1] != original_key:
     return
+    
   FK = splited_line[2]
+  
   FK = str(FK).replace('"', '')
   if group_name is not None:
     if group_name not in data:
@@ -305,7 +312,7 @@ def bind(
         FK = search_in_labels(FK)
     if FK == -1:
       return
-
+    
     FK = remove_language_tags(FK)
     data[group_name].append({key : FK})
     return
@@ -333,8 +340,18 @@ def bind(
       if next_FK != -1:
         next_FK = next_FK.replace("<http://rdf.freebase.com/ns/m.", "")[:-1]
         label = search_in_labels(str(next_FK))
+    elif key == "owner":
+      next_FK = binary_search(global_owners, FK, cross_columns=True, col_sep="\t")
+      if next_FK != -1:
+        next_FK = next_FK.replace("<http://rdf.freebase.com/ns/m.", "")[:-1]
+        label = search_in_labels(str(next_FK))
+    elif original_key == "<http://rdf.freebase.com/ns/visual_art.artwork.locations>":
+      next_FK = binary_search(global_artwork_location_relationship, FK, cross_columns=True, col_sep="\t")
+      if next_FK != -1:
+        next_FK = next_FK.replace("<http://rdf.freebase.com/ns/m.", "")[:-1]
+        label = search_in_labels(str(next_FK))
     else:
-      label = search_in_labels(str(FK))
+      label = search_in_labels(FK)
     if label == -1:
       return
 
@@ -393,9 +410,12 @@ def bind_image(splited_line, data, data_type):
       f = open('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]), 'wb')
       f.write(urllib.urlopen(url).read())
       f.close()
-      b = os.path.getsize('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
-    if b < 10000:
-      os.remove('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2])
+    b = os.path.getsize('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
+    if b < 2500:
+      try:
+        os.remove('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
+      except Exception:
+        pass
     else:
       image = {}
       image["path"] = "%s.jpg" % splited_line[2]
@@ -413,6 +433,21 @@ def load_global_list(name):
   return dial
 
 def main():
+  global global_labels
+  global global_numbers
+  global global_latitudes
+  global global_longitudes
+  global global_height_meters
+  global global_width_meters
+  global global_depth_meters
+  global global_citytowns
+  global global_countries
+  global global_postal_codes
+  global global_state_province_regions
+  global global_locations
+  global global_owners
+  global global_artwork_location_relationship
+
   argument_types = ["art_period_movement", "artist", "artwork", "event", "museum", "location", "visual_art_form", "visual_art_genre", "visual_art_medium"]
   parser = argparse.ArgumentParser()
   parser.add_argument('-t', '--data-type', default=False, dest='data_type', type=str, help='Select data type to convert. (artist, artwork, person, location)', nargs=1)
@@ -442,6 +477,8 @@ def main():
     global_postal_codes = load_global_list("postal_codes")
     global_state_province_regions = load_global_list("state_province_regions")
     global_locations = load_global_list("locations")
+    global_owners = load_global_list("owners")
+    global_artwork_location_relationship = load_global_list("artwork_location_relationship")
     if arguments.data_type[0] == "all":
       convert_rdf_to_dic(ids_list, "all")
     else:
