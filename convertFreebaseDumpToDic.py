@@ -74,7 +74,7 @@ def convert_rdf_to_dic(ids, data_type):
       splited_line = line.split('\t')
 
       #save part of results to file
-      if len(results) >= 10000:
+      if len(results) >= 100000:
         print_data(results, data_type)
 
       old_item_id = item_id
