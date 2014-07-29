@@ -402,16 +402,17 @@ def bind_image(splited_line, data, data_type):
     splited_line[2] = splited_line[2].replace("<http://rdf.freebase.com/ns/m.", "")[:-1]
     #google freebase api key 
 
-    if not os.path.isfile('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2])):
-      #freebase api url
-      url = "https://usercontent.googleapis.com/freebase/v1/image/m/%s?key=%s&maxheight=4096" % (splited_line[2], global_api_key)
-
-      #save image
+    #if not os.path.isfile('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2])):
+    #freebase api url
+    url = "https://usercontent.googleapis.com/freebase/v1/image/m/%s?key=%s&maxheight=4096" % (splited_line[2], global_api_key)
+    #save image
+    data = urllib.urlopen(url).read()
+    if not "dailyLimitExceeded" in data:
       f = open('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]), 'wb')
-      f.write(urllib.urlopen(url).read())
+      f.write(data)
       f.close()
     b = os.path.getsize('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
-    if b < 2500:
+    if b < 500:
       try:
         os.remove('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
       except Exception:
@@ -477,8 +478,9 @@ def main():
     global_postal_codes = load_global_list("postal_codes")
     global_state_province_regions = load_global_list("state_province_regions")
     global_locations = load_global_list("locations")
-    global_owners = load_global_list("owners")
-    global_artwork_location_relationship = load_global_list("artwork_location_relationship")
+    if arguments.data_type[0] == "artwork":
+      global_owners = load_global_list("owners")
+      global_artwork_location_relationship = load_global_list("artwork_location_relationship")
     if arguments.data_type[0] == "all":
       convert_rdf_to_dic(ids_list, "all")
     else:
