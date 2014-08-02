@@ -402,15 +402,15 @@ def bind_image(splited_line, data, data_type):
     splited_line[2] = splited_line[2].replace("<http://rdf.freebase.com/ns/m.", "")[:-1]
     #google freebase api key 
 
-    #if not os.path.isfile('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2])):
-    #freebase api url
-    url = "https://usercontent.googleapis.com/freebase/v1/image/m/%s?key=%s&maxheight=4096" % (splited_line[2], global_api_key)
-    #save image
-    data = urllib.urlopen(url).read()
-    if not "dailyLimitExceeded" in data:
-      f = open('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]), 'wb')
-      f.write(data)
-      f.close()
+    if not os.path.isfile('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2])):
+      #freebase api url
+      url = "https://usercontent.googleapis.com/freebase/v1/image/m/%s?key=%s&maxheight=4096" % (splited_line[2], global_api_key)
+      #save image
+      image_data = urllib.urlopen(url).read()
+      if not "dailyLimitExceeded" in image_data:
+        f = open('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]), 'wb')
+        f.write(image_data)
+        f.close()
     b = os.path.getsize('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
     if b < 500:
       try:

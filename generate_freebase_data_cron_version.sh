@@ -26,7 +26,7 @@ if [ "$past_size" == "$pre_size" ]
 then
   #no changes
   echo -e "no changes"
-  exit 0
+  #exit 0
 fi
 echo -e "freebase-rdf.gz downloaded"
 
@@ -52,13 +52,13 @@ if [ ! -d "freebase" ]; then
 fi
 
 # generate help files to help folder
-echo -e "Generating ids files and labels file... "
-python ${_crawler_path}convertFreebaseDumpToDic.py -t ids --dump-loc ${file}
-if [ $? == 1 ]
-then
-  echo "error in script convertFreebaseDumpToDic.py -t ids"
-  exit 1
-fi
+#echo -e "Generating ids files and labels file... "
+#python ${_crawler_path}convertFreebaseDumpToDic.py -t ids --dump-loc ${file}
+#if [ $? == 1 ]
+#then
+#  echo "error in script convertFreebaseDumpToDic.py -t ids"
+#  exit 1
+#fi
 echo -e "Ids files and labels files are ready"
 echo -e "Generating .info files ..."
 for entity_type in "${entity_types[@]}"
@@ -93,11 +93,11 @@ done
 echo -e "Run generating freebase.nationalities"
 cat info/location.info | python ${_crawler_path}convertJsonToColumns.py -b -t nationalities > freebase/freebase.nationalities
 
-if [ ! -d {$_data_path}"latest" ]; then
-  mkdir {$_data_path}"latest"
+if [ ! -d ${_data_path}"latest" ]; then
+  mkdir ${_data_path}"latest"
 fi
 
-mv info/* {$_data_path}"latest"
-mv freebase/* {$_data_path}"latest"
+mv info/* ${_data_path}"latest"
+mv freebase/* ${_data_path}"latest"
 
 echo -e "DONE"
