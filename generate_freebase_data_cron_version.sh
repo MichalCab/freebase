@@ -75,12 +75,26 @@ do
 done
 echo -e "Info files are ready"
 
+cd info 
+${_crawler_path}/others/divide.sh person.info
+sed -i 's/$/]/g' person.info.parts.aa
+sed -i 's/$/]/g' person.info.parts.ab
+sed -i 's/^/[/g' person.info.parts.ac
+cd - 
+
 for entity_type in "${entity_types[@]}"
 do
   if [ -r info/${entity_type}.info ]
   then
     echo -e "Run generating freebase.${entity_type}s in background"
-    cat info/${entity_type}.info | python ${_crawler_path}convertJsonToColumns.py -b -t ${entity_type} > freebase/freebase.${entity_type}s &
+    if [ ${entity_type} == "person" ]
+    then
+      cat info/${entity_type}.info | python ${_crawler_path}convertJsonToColumns.py -b -t ${entity_type} > freebase/freebase.${entity_type}s &
+    else
+      cat info/${entity_type}.info | python ${_crawler_path}convertJsonToColumns.py -b -t ${entity_type}.parts.aa > freebase/freebase.${entity_type}s.parts.aa &
+      cat info/${entity_type}.info | python ${_crawler_path}convertJsonToColumns.py -b -t ${entity_type}.parts.ab > freebase/freebase.${entity_type}s.parts.ab &
+      cat info/${entity_type}.info | python ${_crawler_path}convertJsonToColumns.py -b -t ${entity_type}.parts.ac > freebase/freebase.${entity_type}s.parts.ac &
+    fi
     if [ $? == 1 ]
     then
       echo -e "error in script convertJsonToColumns.py"

@@ -144,7 +144,7 @@ def load_data(_filename, data_type):
     if "nationality" in d:
       fields = d["nationality"]
       for f in fields:
-        nationality_string = binarySearch(global_nationality_country, format_string(f), cross_columns=True, col_sep="\t")
+        nationality_string = binary_search(global_nationality_country, format_string(f), cross_columns=True, col_sep="\t")
         if nationality_string == -1:
           nationality_string = f
         try:
