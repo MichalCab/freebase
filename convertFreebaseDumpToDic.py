@@ -411,17 +411,20 @@ def bind_image(splited_line, data, data_type):
         f = open('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]), 'wb')
         f.write(image_data)
         f.close()
-    b = os.path.getsize('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
-    if b < 500:
-      try:
-        os.remove('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
-      except Exception:
-        pass
-    else:
-      image = {}
-      image["path"] = "%s.jpg" % splited_line[2]
-      image["id"] = splited_line[2]
-      data["image"].append(image)
+    try:
+      b = os.path.getsize('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
+      if b < 500:
+        try:
+          os.remove('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
+        except Exception:
+          pass
+      else:
+        image = {}
+        image["path"] = "%s.jpg" % splited_line[2]
+        image["id"] = splited_line[2]
+        data["image"].append(image)
+    except:
+      pass
 
 def load_global_list(name):
   path = "help/"
