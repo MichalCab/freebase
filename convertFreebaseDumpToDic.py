@@ -402,29 +402,28 @@ def bind_image(splited_line, data, data_type):
     splited_line[2] = splited_line[2].replace("<http://rdf.freebase.com/ns/m.", "")[:-1]
     #google freebase api key 
 
-    if not os.path.isfile('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2])):
-      #freebase api url
+    image_path = '/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2])
+
+    if not os.path.isfile(image_path) or (os.path.isfile(image_path) and os.path.getsize(image_path) < 500):
       url = "https://usercontent.googleapis.com/freebase/v1/image/m/%s?key=%s&maxheight=4096" % (splited_line[2], global_api_key)
       #save image
       image_data = urllib.urlopen(url).read()
       if not "dailyLimitExceeded" in image_data:
-        f = open('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]), 'wb')
-        f.write(image_data)
-        f.close()
-    try:
-      b = os.path.getsize('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
+        with open(image_path, 'wb') as f:
+          f.write(image_data)
+      
+    if os.path.isfile(image_path):
+      b = os.path.getsize(image_path)
       if b < 500:
         try:
-          os.remove('/mnt/data/kb/images/freebase/%s.jpg' % (splited_line[2]))
+          os.remove(image_path)
         except Exception:
           pass
-      else:
-        image = {}
-        image["path"] = "%s.jpg" % splited_line[2]
-        image["id"] = splited_line[2]
-        data["image"].append(image)
-    except:
-      pass
+    if os.path.isfile(image_path):
+      image = {}
+      image["path"] = "%s.jpg" % splited_line[2]
+      image["id"] = splited_line[2]
+      data["image"].append(image)
 
 def load_global_list(name):
   path = "help/"
